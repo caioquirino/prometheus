@@ -1,5 +1,6 @@
 prometheus:
   build: "prom/"
+  hostname: prometheus
   ports:
     - "9090:9090"
   container_name: prometheus
@@ -18,9 +19,11 @@ exporter:
 sqlite3:
   image: "prom/promdash"
   command:
-    - "./bin/rake db:migrate"
+#    - ./bin/rake db:migrate ; sleep infinity
+    - sleep infinity
+#    - "/bin/sh -c \"./bin/rake db:migrate && sleep infinity\""
   volumes:
-    - "/tmp/prom:/tmp/prom"
+    - "./prom_data:/tmp/prom"
   environment:
     - "DATABASE_URL=sqlite3:/tmp/prom/file.sqlite3"
 
@@ -31,7 +34,7 @@ promdash:
   expose:
     - "3000"
   volumes:
-    - /tmp/prom:/tmp/prom
+    - ./prom_data:/tmp/prom
   environment:
     - "DATABASE_URL=sqlite3:/tmp/prom/file.sqlite3"
   container_name: promdash
